@@ -31,6 +31,12 @@ const RepairSheetForm = () => {
     setComponentsChanged(updatedComponents);
   };
 
+  // Handler for deleting a component
+  const deleteComponent = (index) => {
+    const updatedComponents = componentsChanged.filter((_, i) => i !== index);
+    setComponentsChanged(updatedComponents);
+  };
+
   // Handler for submitting the form
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -44,7 +50,7 @@ const RepairSheetForm = () => {
   };
 
   return (
-    <div className="bg-gray-800 text-white p-6 rounded-lg shadow-md w-full max-w-lg mx-auto">
+    <div className="text-white p-10 rounded-lg shadow-md max-w-lg mx-auto">
       <h2 className="text-2xl font-bold mb-6">Repair Sheet</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Dropdown for Laptop selection */}
@@ -89,9 +95,9 @@ const RepairSheetForm = () => {
 
         {/* Dropdown for Components Changed */}
         <div>
-          <label className="block mb-2">Component Changed:</label>
+          <label className="block mb-2">Components Changed:</label>
           {componentsChanged.map((component, index) => (
-            <div key={index} className="flex space-x-2 mb-2">
+            <div key={index} className="flex items-center space-x-2 mb-2">
               <select
                 value={component}
                 onChange={(e) => handleComponentChange(index, e.target.value)}
@@ -104,6 +110,13 @@ const RepairSheetForm = () => {
                   </option>
                 ))}
               </select>
+              <button
+                type="button"
+                onClick={() => deleteComponent(index)}
+                className="bg-red-600 hover:bg-red-500 text-white px-2 py-1 rounded"
+              >
+                Delete
+              </button>
             </div>
           ))}
           <button

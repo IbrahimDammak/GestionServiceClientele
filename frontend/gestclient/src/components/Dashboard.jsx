@@ -23,7 +23,7 @@ const Dashboard = () => {
     console.log("User logged out");
   };
   return (
-    <div className="flex h-screen bg-blue-950">
+    <div className="flex h-screen bg-gray-800">
       <Sidebar />
       <div className="relative flex-grow grid grid-cols-4 gap-6 p-6 pt-20 w-full">
         {/* Deconnexion Button */}

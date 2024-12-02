@@ -55,7 +55,7 @@ const AddClientPage = () => {
   };
 
   return (
-    <div className="flex h-screen bg-blue-950">
+    <div className="flex h-screen bg-gray-800">
       <Sidebar />
       <div className="flex-grow p-6 w-full pt-20">
         <div className="max-w-2xl mx-auto bg-gray-800 p-6 rounded shadow-lg text-white">
