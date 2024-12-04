@@ -1,4 +1,7 @@
 package org.ibrahim.gestionreparation.repository;
 
-public class DemandeReparationRepository {
+import org.ibrahim.gestionreparation.model.DemandeReparation;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface DemandeReparationRepository extends JpaRepository<DemandeReparation, Long> {
 }
