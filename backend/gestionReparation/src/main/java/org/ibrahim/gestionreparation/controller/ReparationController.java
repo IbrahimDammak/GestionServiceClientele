@@ -25,9 +25,11 @@ public class ReparationController {
     // Create or update a reparation
     @PostMapping
     public ResponseEntity<Reparation> saveReparation(@RequestBody Reparation reparation) {
-        Reparation savedReparation = reparationService.saveReparation(reparation);
-        return new ResponseEntity<>(savedReparation, HttpStatus.CREATED);
+        // Save the reparation and set the tarifHMO
+        Reparation savedReparation = reparationService.saveReparationWithTarif(reparation);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedReparation);
     }
+
 
     // Get all reparations
     @GetMapping

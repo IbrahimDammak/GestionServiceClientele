@@ -1,5 +1,6 @@
 package org.ibrahim.gestionreparation.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.ibrahim.gestionreparation.model.TypePiece;
 import org.ibrahim.gestionreparation.repository.TypePieceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,30 +12,42 @@ import java.util.Optional;
 @Service
 public class TypePieceService {
 
-    private final TypePieceRepository typePieceRepository;
-
     @Autowired
-    public TypePieceService(TypePieceRepository typePieceRepository) {
-        this.typePieceRepository = typePieceRepository;
-    }
+    private TypePieceRepository typePieceRepository;
 
-    // Create or update a type de piece
-    public TypePiece saveTypePiece(TypePiece typePiece) {
-        return typePieceRepository.save(typePiece);
-    }
-
-    // Get all types de pieces
+    // Get all TypePieces
     public List<TypePiece> getAllTypePieces() {
         return typePieceRepository.findAll();
     }
 
-    // Get type de piece by ID
-    public Optional<TypePiece> getTypePieceById(Long id) {
-        return typePieceRepository.findById(id);
+    // Get a TypePiece by ID
+    public TypePiece getTypePieceById(Long id) {
+        return typePieceRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("TypePiece not found with ID: " + id));
     }
 
-    // Delete a type de piece by ID
+    // Save a new TypePiece
+    public TypePiece saveTypePiece(TypePiece typePiece) {
+        // Ensure that associated PieceRechange entities are properly handled
+        return typePieceRepository.save(typePiece);
+    }
+
+    // Update an existing TypePiece
+    public TypePiece updateTypePiece(Long id, TypePiece updatedTypePiece) {
+        TypePiece existingTypePiece = getTypePieceById(id);
+
+        // Update the list of PieceRechange if necessary
+        existingTypePiece.setPieceRechange(updatedTypePiece.getPieceRechange());
+
+        // Update other fields as needed
+        return typePieceRepository.save(existingTypePiece);
+    }
+
+    // Delete a TypePiece
     public void deleteTypePiece(Long id) {
+        if (!typePieceRepository.existsById(id)) {
+            throw new EntityNotFoundException("TypePiece not found with ID: " + id);
+        }
         typePieceRepository.deleteById(id);
     }
 }

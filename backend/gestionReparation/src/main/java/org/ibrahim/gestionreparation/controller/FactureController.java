@@ -21,12 +21,19 @@ public class FactureController {
         this.factureService = factureService;
     }
 
-    // Create or update a facture
+//    // Create or update a facture
+//    @PostMapping
+//    public ResponseEntity<Facture> saveFacture(@RequestBody Facture facture) {
+//        Facture savedFacture = factureService.saveFacture(facture);
+//        return new ResponseEntity<>(savedFacture, HttpStatus.CREATED);
+//    }
+
     @PostMapping
-    public ResponseEntity<Facture> saveFacture(@RequestBody Facture facture) {
-        Facture savedFacture = factureService.saveFacture(facture);
-        return new ResponseEntity<>(savedFacture, HttpStatus.CREATED);
+    public ResponseEntity<Facture> createFacture(@RequestBody Facture facture) {
+        Facture savedFacture = factureService.createFacture(facture);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedFacture);
     }
+
 
     // Get all factures
     @GetMapping

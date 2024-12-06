@@ -19,6 +19,10 @@ public class DemandeReparation {
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;  // Relationship with Client
 
+    @ManyToOne
+    @JoinColumn(name = "appareil_id")
+    private Appareil appareil;
+
     @Column(nullable = false)
     private Date dateDepotAppareil;
 

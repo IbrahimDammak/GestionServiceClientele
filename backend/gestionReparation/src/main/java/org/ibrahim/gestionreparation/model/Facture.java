@@ -2,6 +2,8 @@ package org.ibrahim.gestionreparation.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -13,16 +15,13 @@ public class Facture {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "demande_reparation_id", nullable = false)
-    private DemandeReparation demandeReparation;  // Relationship with DemandeReparation
+    private LocalDate date;
 
-    @Column(nullable = false)
-    private Date date;
-
-    @Column(nullable = false)
-    private Double montantTotal;
-
-    @Column(nullable = false)
     private String numero;
+
+    private double montantTotal;
+
+    @OneToOne
+    @JoinColumn(name = "reparation_id", referencedColumnName = "id")
+    private Reparation reparation;
 }

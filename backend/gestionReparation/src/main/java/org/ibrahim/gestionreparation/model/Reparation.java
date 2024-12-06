@@ -4,7 +4,10 @@ package org.ibrahim.gestionreparation.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "reparations")
@@ -16,19 +19,22 @@ public class Reparation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "demande_reparation_id", nullable = false)
-    private DemandeReparation demandeReparation;  // Relationship with DemandeReparation
+    private LocalDate dateRep;
 
-    @Column(nullable = false)
-    private Date dateRep;
-
-    @Column(nullable = false)
     private String description;
 
-    @Column(nullable = false)
-    private Double tarifHMO;
+    private double tarifHMO;
 
-    @Column(nullable = false)
-    private Double tempsMO;
+    private double tempsMO;
+
+    @OneToOne
+    @JoinColumn(name = "type_piece_id", referencedColumnName = "id")
+    private TypePiece typePiece;
+
+    @ManyToOne
+    @JoinColumn(name = "piece_recharge_id", referencedColumnName = "id")
+    private PieceRechange pieceRechange;
+
+    private int qte;
+
 }

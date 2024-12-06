@@ -4,6 +4,9 @@ package org.ibrahim.gestionreparation.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "pieces_rechange")
 @Data
@@ -31,4 +34,8 @@ public class PieceRechange {
 
     @Column(nullable = false)
     private Integer qte;
+
+    @OneToMany(mappedBy = "piecerechange", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReparationPiece> reparationPieces = new ArrayList<>();
+
 }
