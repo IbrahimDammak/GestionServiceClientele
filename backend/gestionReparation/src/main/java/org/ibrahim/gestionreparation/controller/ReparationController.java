@@ -13,6 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/reparations")
+@CrossOrigin(origins = "http://localhost:3000")
 public class ReparationController {
 
     private final ReparationService reparationService;
@@ -26,7 +27,7 @@ public class ReparationController {
     @PostMapping
     public ResponseEntity<Reparation> saveReparation(@RequestBody Reparation reparation) {
         // Save the reparation and set the tarifHMO
-        Reparation savedReparation = reparationService.saveReparationWithTarif(reparation);
+        Reparation savedReparation = reparationService.saveReparation(reparation);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedReparation);
     }
 

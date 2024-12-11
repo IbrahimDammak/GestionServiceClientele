@@ -19,22 +19,22 @@ public class Reparation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private LocalDate dateRep;
 
+    @Column(nullable = false)
     private String description;
 
-    private double tarifHMO;
+    private double tarifHMO = 15 ;
 
+    @Column(nullable = false)
     private double tempsMO;
 
     @OneToOne
-    @JoinColumn(name = "type_piece_id", referencedColumnName = "id")
-    private TypePiece typePiece;
+    @JoinColumn(name = "demande_Reparation_id", nullable = false)
+    private DemandeReparation demandeReparation;
 
-    @ManyToOne
-    @JoinColumn(name = "piece_recharge_id", referencedColumnName = "id")
-    private PieceRechange pieceRechange;
-
-    private int qte;
+    @OneToMany(mappedBy = "reparation", cascade = CascadeType.ALL)
+    private List<ReparationPiece> reparationPieces;
 
 }

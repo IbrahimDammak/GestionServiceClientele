@@ -11,5 +11,5 @@ public class TarifHMOConfig {
     @Id
     private int id;
     @Column(unique=true, nullable=false)
-    private double tarifHMO;
+    private double tarifHMO = 15;
 }

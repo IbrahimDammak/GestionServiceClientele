@@ -3,10 +3,12 @@ package org.ibrahim.gestionreparation.service;
 
 import org.ibrahim.gestionreparation.model.Facture;
 import org.ibrahim.gestionreparation.model.Reparation;
+import org.ibrahim.gestionreparation.model.ReparationPiece;
 import org.ibrahim.gestionreparation.repository.FactureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,12 +16,14 @@ import java.util.Optional;
 public class FactureService {
 
     private final FactureRepository factureRepository;
+    private final ReparationService reparationService;
     private TypePieceService typePieceService;
 
 
     @Autowired
-    public FactureService(FactureRepository factureRepository) {
+    public FactureService(FactureRepository factureRepository, ReparationService reparationService) {
         this.factureRepository = factureRepository;
+        this.reparationService = reparationService;
     }
 
 //    // Create or update a facture
@@ -31,21 +35,27 @@ public class FactureService {
 
     public Facture createFacture(Facture facture) {
         // Fetch the associated Reparation
-        Reparation reparation = facture.getReparation();
+        long repId = facture.getReparation().getId();
 
-        if (reparation == null) {
-            throw new RuntimeException("Reparation must be associated with a Facture");
-        }
+        Reparation rep = reparationService.getReparationById(repId).get();
 
         // Retrieve necessary values for calculation
-        double tarifH = reparation.getTypePiece().getTarifH();
-        double tempsMO = reparation.getTempsMO();
-        double tarifHMO = reparation.getTarifHMO();
-        double prixTTC = reparation.getPieceRechange().getPrixTTC();
-        int qte = reparation.getQte();
+        double tarifHMO = rep.getTarifHMO();
+        double tempsMO = rep.getTempsMO();
+
+
+        List<ReparationPiece> reparationPieces = rep.getReparationPieces();
+        double coutP = 0;
+
+        for (ReparationPiece repPiece : reparationPieces) {
+            coutP+= (repPiece.getPiecerechange().getPrixTTC() * repPiece.getQte()) + (repPiece.getPiecerechange().getTypePiece().getTarifH()*repPiece.getQte());
+        }
 
         // Calculate the montantTotal
-        double montantTotal = (tarifH * qte * tempsMO) + (prixTTC * qte) + (tarifHMO * tempsMO);
+        double montantTotal = coutP + (tarifHMO *tempsMO);
+
+        String num = "N_"+ LocalDate.now().getYear()+"000"+ repId;
+        facture.setNumero(num);
 
         // Set the montantTotal in the Facture
         facture.setMontantTotal(montantTotal);

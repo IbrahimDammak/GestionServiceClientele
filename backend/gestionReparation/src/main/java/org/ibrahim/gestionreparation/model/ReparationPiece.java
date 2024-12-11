@@ -1,5 +1,6 @@
 package org.ibrahim.gestionreparation.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.boot.autoconfigure.web.WebProperties;
@@ -14,10 +15,12 @@ public class ReparationPiece {
 
     @ManyToOne
     @JoinColumn(name = "piece_rechange_id", nullable = false)
+    @JsonBackReference
     private PieceRechange piecerechange;
 
     @ManyToOne
     @JoinColumn(name = "reparation_id", nullable = false)
+    @JsonBackReference
     private Reparation reparation;
 
     @Column(nullable = false)

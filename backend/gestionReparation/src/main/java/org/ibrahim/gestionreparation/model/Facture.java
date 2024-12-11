@@ -15,7 +15,7 @@ public class Facture {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDate date;
+    private LocalDate date = LocalDate.now();
 
     private String numero;
 

@@ -1,51 +1,80 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { getAllParts, savePart, deletePart } from "../service/CatalogueServicePage";
 import Sidebar from "../components/Sidebar";
 
 const CataloguePage = () => {
-  const [parts, setParts] = useState([
-    { id: 1, name: "SSD 500GB", price: 200, hourlyRate: 25, brand: "Samsung" },
-    { id: 2, name: "RAM 16GB", price: 150, hourlyRate: 20, brand: "Corsair" },
-  ]);
-
+  const [parts, setParts] = useState([]); 
   const [searchQuery, setSearchQuery] = useState("");
   const [filterBrand, setFilterBrand] = useState("");
   const [filterPrice, setFilterPrice] = useState("");
   const [currentPart, setCurrentPart] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
+  // Fetch parts data from API using axios service
+  useEffect(() => {
+    getAllParts()
+      .then((response) => {
+        setParts(response.data);
+        console.log(response.data) // Set parts data to state
+      })
+      .catch((error) => {
+        console.error("There was an error fetching the parts!", error);
+      });
+  }, []);
+
   const handleSearch = (e) => setSearchQuery(e.target.value);
 
   const handleFilterBrand = (e) => setFilterBrand(e.target.value);
 
-  const filteredParts = parts.filter(
+  const filteredParts = Array.isArray(parts) ? parts.filter(
     (part) =>
-      part.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      part.nom.toLowerCase().includes(searchQuery.toLowerCase()) &&
       (filterBrand === "" || part.brand === filterBrand) &&
       (filterPrice === "" || part.price <= parseFloat(filterPrice))
-  );
+  ) : [];
 
   const handleAddOrEdit = (e) => {
     e.preventDefault();
 
-    if (currentPart?.id) {
-      setParts(
-        parts.map((part) =>
-          part.id === currentPart.id ? currentPart : part
-        )
-      );
-    } else {
-      setParts([
-        ...parts,
-        { ...currentPart, id: parts.length + 1 },
-      ]);
-    }
+    const partData = {
+      ...currentPart,
+      price: parseFloat(currentPart.prixTTC),
+      hourlyRate: parseFloat(currentPart.typePiece.tarifH),
+    };
 
-    setShowForm(false);
-    setCurrentPart(null);
+    if (currentPart?.id) {
+      // Update part
+      savePart(currentPart.id, partData)
+        .then((response) => {
+          setParts(parts.map((part) => (part.id === currentPart.id ? response.data : part)));
+          setShowForm(false);
+          setCurrentPart(null);
+        })
+        .catch((error) => {
+          console.error("There was an error updating the part!", error);
+        });
+    } else {
+      // Add new part
+     savePart(partData)
+        .then((response) => {
+          setParts([...parts, response.data]);
+          setShowForm(false);
+          setCurrentPart(null);
+        })
+        .catch((error) => {
+          console.error("There was an error adding the part!", error);
+        });
+    }
   };
 
   const handleDelete = (id) => {
-    setParts(parts.filter((part) => part.id !== id));
+    deletePart(id)
+      .then(() => {
+        setParts(parts.filter((part) => part.id !== id));
+      })
+      .catch((error) => {
+        console.error("There was an error deleting the part!", error);
+      });
   };
 
   return (
@@ -103,10 +132,10 @@ const CataloguePage = () => {
               key={part.id}
               className="bg-white p-4 rounded shadow text-black"
             >
-              <h3 className="font-bold">{part.name}</h3>
-              <p>Brand: {part.brand}</p>
-              <p>Price: {part.price} DT</p>
-              <p>Hourly Rate: {part.hourlyRate} DT</p>
+              <h3 className="font-bold">{part.nom}</h3>
+              <p>type Piece: {part.typePiece.type}</p>
+              <p>Price: {part.prixTTC} DT</p>
+              <p>Hourly Rate: {part.typePiece.tarifH} DT</p>
               <div className="flex space-x-2 mt-4">
                 <button
                   onClick={() => {

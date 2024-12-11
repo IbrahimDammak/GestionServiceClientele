@@ -38,4 +38,7 @@ public class DemandeReparationService {
     public void deleteDemandeReparation(Long id) {
         demandeReparationRepository.deleteById(id);
     }
+    public List<DemandeReparation> getDemandesReparationByClientId(Long clientId) {
+        return demandeReparationRepository.findByClientId(clientId);
+    }
 }

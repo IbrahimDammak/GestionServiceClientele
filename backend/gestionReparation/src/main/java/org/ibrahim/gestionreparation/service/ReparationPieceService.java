@@ -25,15 +25,15 @@ public class ReparationPieceService {
     private PieceRechangeRepository pieceRechangeRepository;
 
     // Save a ReparationPiece
-    public ReparationPiece saveReparationPiece(Long reparationId, Long pieceRechangeId) {
-        Reparation reparation = reparationRepository.findById(reparationId)
-                .orElseThrow(() -> new EntityNotFoundException("Reparation not found"));
-        PieceRechange pieceRechange = pieceRechangeRepository.findById(pieceRechangeId)
-                .orElseThrow(() -> new EntityNotFoundException("PieceRechange not found"));
-
-        ReparationPiece reparationPiece = new ReparationPiece();
-        reparationPiece.setReparation(reparation);
-        reparationPiece.setPiecerechange(pieceRechange);
+    public ReparationPiece saveReparationPiece(ReparationPiece reparationPiece) {
+//        Reparation reparation = reparationRepository.findById(reparationId)
+//                .orElseThrow(() -> new EntityNotFoundException("Reparation not found"));
+//        PieceRechange pieceRechange = pieceRechangeRepository.findById(pieceRechangeId)
+//                .orElseThrow(() -> new EntityNotFoundException("PieceRechange not found"));
+//
+//        ReparationPiece reparationPiece = new ReparationPiece();
+//        reparationPiece.setReparation(reparation);
+//        reparationPiece.setPiecerechange(pieceRechange);
 
         return reparationPieceRepository.save(reparationPiece);
     }

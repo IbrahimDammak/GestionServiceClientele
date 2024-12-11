@@ -1,8 +1,10 @@
 package org.ibrahim.gestionreparation.model;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.context.annotation.Lazy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,7 @@ public class PieceRechange {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
 
     @ManyToOne
     @JoinColumn(name = "type_piece_id", nullable = false)
@@ -32,10 +35,9 @@ public class PieceRechange {
     @Column(nullable = false)
     private Double prixTTC;
 
-    @Column(nullable = false)
-    private Integer qte;
 
     @OneToMany(mappedBy = "piecerechange", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReparationPiece> reparationPieces = new ArrayList<>();
+    @JsonManagedReference
+    private List<ReparationPiece> reparationPieces;
 
 }

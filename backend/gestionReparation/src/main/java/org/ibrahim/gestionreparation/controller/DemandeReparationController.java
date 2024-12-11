@@ -13,6 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/demandes-reparation")
+@CrossOrigin(origins = "http://localhost:3000")
 public class DemandeReparationController {
 
     private final DemandeReparationService demandeReparationService;
@@ -48,5 +49,15 @@ public class DemandeReparationController {
     public ResponseEntity<Void> deleteDemandeReparation(@PathVariable Long id) {
         demandeReparationService.deleteDemandeReparation(id);
         return ResponseEntity.noContent().build();
+    }
+
+
+    @GetMapping("/client/{clientId}")
+    public ResponseEntity<List<DemandeReparation>> getDemandesReparationByClientId(@PathVariable Long clientId) {
+        List<DemandeReparation> demandes = demandeReparationService.getDemandesReparationByClientId(clientId);
+        if (demandes.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(demandes, HttpStatus.OK);
     }
 }

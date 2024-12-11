@@ -9,11 +9,11 @@ const ClientsSection = ({ clients }) => {
       <div className="space-y-4">
         {clients.map((client) => (
           <ClientItem 
-            key={client.id} 
-            id={client.id} 
-            name={client.name} 
-            laptopRef={client.laptopRef} 
-            status={client.status} 
+            key={client.client.id} 
+            id={client.client.id} 
+            name={client.client.nom} 
+            laptopRef={client.appareil.numSerie} 
+            status={client.etat} 
           />
         ))}
       </div>
