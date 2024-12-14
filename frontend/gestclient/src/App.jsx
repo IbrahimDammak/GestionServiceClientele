@@ -31,7 +31,7 @@ function App() {
         <Route path="/laptops-repaired" element={<LaptopsRepairedPage />} />
         <Route path="/client-details/:id" element={<ClientDetails />} />
         <Route path="/add-client" element={<AddClientPage />} />
-        <Route path="/technician/create-repair-sheet" element={<TechnicianRepairPage />} />
+        <Route path="/technician/create-repair-sheet/:reparationDemandeId" element={<TechnicianRepairPage />} />
         <Route path="/technician/Facture" element={<FactureTechPage />} />
         <Route path="/tech/catalogue" element={<CatalogueTechPage />} />
         <Route path="/rsc/catalogue" element={<CatalogueRscPage />} />

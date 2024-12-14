@@ -63,7 +63,7 @@ const AddClientPage = () => {
         appareil: { id: deviceId },
         dateDepotAppareil,
         datePreuveRep,
-        etat: "Non réparé", // Default value
+        etat: "non réparé", // Default value
         symptomesPanne,
       });
 

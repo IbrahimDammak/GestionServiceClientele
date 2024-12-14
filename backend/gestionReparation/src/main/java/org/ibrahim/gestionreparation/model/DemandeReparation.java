@@ -1,10 +1,10 @@
 package org.ibrahim.gestionreparation.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Date;
-
 
 @Entity
 @Table(name = "demandes_reparation")
@@ -17,7 +17,7 @@ public class DemandeReparation {
 
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)
-    private Client client;  // Relationship with Client
+    private Client client;
 
     @ManyToOne
     @JoinColumn(name = "appareil_id")
@@ -34,4 +34,9 @@ public class DemandeReparation {
 
     @Column(nullable = false)
     private String symptomesPanne;
+
+    @OneToOne(mappedBy = "demandeReparation")
+    @JsonBackReference // Prevent recursion from this side
+    private Reparation reparation;
 }
+
