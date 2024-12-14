@@ -1,6 +1,7 @@
 package org.ibrahim.gestionreparation.service;
 
 
+import org.ibrahim.gestionreparation.dto.FactureDTO;
 import org.ibrahim.gestionreparation.model.Facture;
 import org.ibrahim.gestionreparation.model.Reparation;
 import org.ibrahim.gestionreparation.model.ReparationPiece;
@@ -25,6 +26,16 @@ public class FactureService {
         this.factureRepository = factureRepository;
         this.reparationService = reparationService;
     }
+
+    public FactureDTO convertToDTO(Facture facture) {
+        FactureDTO dto = new FactureDTO();
+        dto.setId(facture.getId());
+        dto.setNumero(facture.getNumero());
+        dto.setMontantTotal(facture.getMontantTotal());
+        dto.setReparationId(facture.getReparation().getId());
+        return dto;
+    }
+
 
 //    // Create or update a facture
 //    public Facture saveFacture(Facture facture) {

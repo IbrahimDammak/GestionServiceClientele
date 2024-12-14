@@ -1,10 +1,12 @@
 package org.ibrahim.gestionreparation.controller;
 
 
+import org.ibrahim.gestionreparation.dto.ReparationDTO;
 import org.ibrahim.gestionreparation.model.Reparation;
 import org.ibrahim.gestionreparation.service.ReparationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,11 +26,15 @@ public class ReparationController {
     }
 
     // Create or update a reparation
-    @PostMapping
-    public ResponseEntity<Reparation> saveReparation(@RequestBody Reparation reparation) {
-        // Save the reparation and set the tarifHMO
-        Reparation savedReparation = reparationService.saveReparation(reparation);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedReparation);
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> saveReparation(@RequestBody ReparationDTO reparationDTO) {
+        try {
+            Reparation reparation = reparationService.convertFromDTO(reparationDTO);
+            Reparation savedReparation = reparationService.saveReparation(reparation);
+            return ResponseEntity.status(HttpStatus.CREATED).body(reparationService.convertToDTO(savedReparation));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
     }
 
 

@@ -5,7 +5,6 @@ import lombok.Data;
 
 import java.util.Date;
 
-
 @Entity
 @Table(name = "demandes_reparation")
 @Data
@@ -17,7 +16,7 @@ public class DemandeReparation {
 
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)
-    private Client client;  // Relationship with Client
+    private Client client;
 
     @ManyToOne
     @JoinColumn(name = "appareil_id")
