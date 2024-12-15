@@ -1,76 +1,134 @@
-// src/components/RepairSheetForm.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getComponentOptions, createFacture, createReparation } from '../service/ReparationFactrueApiService';
 
-const RepairSheetForm = () => {
-  // Sample data for laptop options
-  const laptopOptions = [
-    { name: 'Lenovo', ref: 'ABC123' },
-    { name: 'HP', ref: 'XYZ789' },
-    { name: 'Dell', ref: 'DEF456' },
-    { name: 'Acer', ref: 'GHI012' },
-  ];
-
-  // Sample data for component options
-  const componentOptions = ['Battery', 'Hard Drive', 'Motherboard', 'RAM', 'Screen'];
-
-  // State for form fields
-  const [selectedLaptop, setSelectedLaptop] = useState('');
+const RepairSheetForm = ({ demandeReparation, componentsChanged, setComponentsChanged }) => {
+  const [componentOptions, setComponentOptions] = useState([]);
   const [hoursSpent, setHoursSpent] = useState('');
   const [repairDescription, setRepairDescription] = useState('');
-  const [componentsChanged, setComponentsChanged] = useState(['']);
 
-  // Handler for adding more component dropdowns
+  // Fetch Component Options
+  useEffect(() => {
+    const fetchComponentOptions = async () => {
+      try {
+        console.log("Fetching component options...");
+        const response = await getComponentOptions();
+        console.log("API Response (Component Options):", response.data);
+        if (Array.isArray(response.data) && response.data.length > 0) {
+          setComponentOptions(response.data);
+          console.log("Component Options Set:", response.data);
+        } else {
+          console.error("No component options returned.");
+        }
+      } catch (error) {
+        console.error("Error fetching component options:", error);
+      }
+    };
+
+    fetchComponentOptions();
+  }, []);
+
   const addMoreComponent = () => {
     setComponentsChanged([...componentsChanged, '']);
+    console.log("Components Changed (After Adding):", componentsChanged);
   };
 
-  // Handler for updating component values
   const handleComponentChange = (index, value) => {
     const updatedComponents = [...componentsChanged];
     updatedComponents[index] = value;
     setComponentsChanged(updatedComponents);
+    console.log("Components Changed (After Update):", componentsChanged);
   };
 
-  // Handler for deleting a component
   const deleteComponent = (index) => {
     const updatedComponents = componentsChanged.filter((_, i) => i !== index);
     setComponentsChanged(updatedComponents);
+    console.log("Components Changed (After Deletion):", componentsChanged);
   };
 
-  // Handler for submitting the form
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Form submission logic here
-    console.log('Repair Sheet Submitted', {
-      selectedLaptop,
-      hoursSpent,
-      repairDescription,
-      componentsChanged,
-    });
+  
+    if (!demandeReparation) {
+      alert('Demande de reparation not loaded.');
+      return;
+    }
+  
+    const reparationData = {
+      description: repairDescription, // Repair description
+      // Hourly labor rate (set as a constant or from user input)
+      tempsMO: parseFloat(hoursSpent), // Hours spent on labor
+      demandeReparation: {
+        id: demandeReparation.id, // Link to demande reparation
+        client: {
+          id: demandeReparation.client.id,
+        },
+        appareil: {
+          id: demandeReparation.appareil.id,
+        },
+      },
+      reparationPieces: componentsChanged
+        .filter((component) => component !== '') // Ensure no empty selections
+        .map((component) => ({
+          id: componentOptions.find((option) => option.nom === component)?.id, // Find the ID for the component
+          qte: 1, // Set default quantity or allow user input
+        })),
+    };
+  
+    console.log("Submitting Reparation Data:", reparationData);
+  
+    try {
+      const reparationResponse = await createReparation(reparationData);
+      const reparationId = reparationResponse.id;
+  
+      // Create facture
+      const factureData = {
+        reparationId
+      };
+  
+      await createFacture(factureData);
+  
+      alert('Reparation and Facture created successfully!');
+    } catch (error) {
+      console.error("Error submitting repair sheet:", error);
+      alert('Failed to create reparation or facture.');
+    }
   };
+  
+
+
+
+  if (!demandeReparation) {
+    return <p className="text-white">Repair details not provided.</p>;
+  }
 
   return (
     <div className="text-white p-10 rounded-lg shadow-md max-w-lg mx-auto">
       <h2 className="text-2xl font-bold mb-6">Repair Sheet</h2>
+
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Dropdown for Laptop selection */}
+        {/* Laptop Details */}
         <div>
-          <label className="block mb-2">Select Laptop:</label>
-          <select
-            value={selectedLaptop}
-            onChange={(e) => setSelectedLaptop(e.target.value)}
-            className="w-full p-2 bg-gray-700 text-white rounded"
-          >
-            <option value="">Select a laptop</option>
-            {laptopOptions.map((laptop, index) => (
-              <option key={index} value={`${laptop.name}-${laptop.ref}`}>
-                {laptop.name} - {laptop.ref}
-              </option>
-            ))}
-          </select>
+          <label className="block mb-2">Selected Laptop:</label>
+          <input
+            type="text"
+            value={`${demandeReparation?.appareil?.marque || ''} ${demandeReparation?.appareil?.modele || ''}`}
+            readOnly
+            className="w-full p-2 bg-gray-700 text-gray-400 rounded cursor-not-allowed"
+          />
         </div>
 
-        {/* Input for Hours Spent */}
+        {/* Serial Number */}
+        <div>
+          <label className="block mb-2">Serial Number:</label>
+          <input
+            type="text"
+            value={demandeReparation?.appareil?.numSerie || ''}
+            readOnly
+            className="w-full p-2 bg-gray-700 text-gray-400 rounded cursor-not-allowed"
+          />
+        </div>
+
+        {/* Hours Spent */}
         <div>
           <label className="block mb-2">Number of Hours Spent:</label>
           <input
@@ -82,61 +140,53 @@ const RepairSheetForm = () => {
           />
         </div>
 
-        {/* Textarea for Repair Description */}
+        {/* Repair Description */}
         <div>
           <label className="block mb-2">Repair Description:</label>
           <textarea
             value={repairDescription}
             onChange={(e) => setRepairDescription(e.target.value)}
             className="w-full p-2 bg-gray-700 text-white rounded"
-            placeholder="Describe the repair..."
+            placeholder="Enter repair description"
           />
         </div>
 
-        {/* Dropdown for Components Changed */}
-        <div>
-          <label className="block mb-2">Components Changed:</label>
-          {componentsChanged.map((component, index) => (
-            <div key={index} className="flex items-center space-x-2 mb-2">
-              <select
-                value={component}
-                onChange={(e) => handleComponentChange(index, e.target.value)}
-                className="w-full p-2 bg-gray-700 text-white rounded"
-              >
-                <option value="">Select a component</option>
-                {componentOptions.map((option, idx) => (
-                  <option key={idx} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-              <button
-                type="button"
-                onClick={() => deleteComponent(index)}
-                className="bg-red-600 hover:bg-red-500 text-white px-2 py-1 rounded"
-              >
-                Delete
-              </button>
-            </div>
-          ))}
-          <button
-            type="button"
-            onClick={addMoreComponent}
-            className="bg-green-600 hover:bg-green-500 text-white p-2 rounded"
-          >
-            Add More
-          </button>
-        </div>
+        {/* Components Changed */}
+        {componentsChanged.map((component, index) => (
+          <div key={index} className="flex items-center gap-2">
+            <select
+              value={component}
+              onChange={(e) => handleComponentChange(index, e.target.value)}
+              className="p-2 bg-gray-700 text-white rounded w-full"
+            >
+              <option value="">Select a component</option>
+              {componentOptions?.map((option) => (
+                <option key={option.id} value={option.nom}>
+                  {option.nom}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => deleteComponent(index)}
+              className="bg-red-600 p-2 rounded text-white"
+            >
+              Remove
+            </button>
+          </div>
+        ))}
 
-        {/* Buttons for Save and Cancel */}
-        <div className="flex space-x-4">
-          <button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white p-2 rounded">
-            Save
-          </button>
-          <button type="button" className="bg-red-600 hover:bg-red-500 text-white p-2 rounded">
-            Cancel
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={addMoreComponent}
+          className="bg-blue-600 p-2 rounded text-white"
+        >
+          Add Component
+        </button>
+
+        <button type="submit" className="bg-green-600 p-2 rounded text-white w-full">
+          Submit Repair Sheet
+        </button>
       </form>
     </div>
   );

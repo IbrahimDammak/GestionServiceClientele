@@ -1,42 +1,38 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TechnicianSidebar from "../components/TechnicianSidebar";
+import laptopService from "../service/laptopService";
+import { useNavigate } from "react-router-dom"; // Import for navigation
 
 const AllLaptopsTech = () => {
-  // Sample data
-  const [laptops, setLaptops] = useState([
-    {
-      id: 1,
-      name: "Dell Inspiron",
-      reference: "REF12345",
-      status: "Waiting for Repair",
-      symptoms: "The laptop won't power on.",
-    },
-    {
-      id: 2,
-      name: "HP EliteBook",
-      reference: "REF67890",
-      status: "Waiting for Repair",
-      symptoms: "Overheating and shutting down randomly.",
-    },
-    {
-      id: 3,
-      name: "Lenovo ThinkPad",
-      reference: "REF11223",
-      status: "Waiting for Repair",
-      symptoms: "Keyboard not functioning properly.",
-    },
-  ]);
-
+  const [laptops, setLaptops] = useState([]);
   const [selectedLaptop, setSelectedLaptop] = useState(null);
+  const navigate = useNavigate();
+
+  // Fetch laptops data using the service
+  useEffect(() => {
+    const fetchLaptops = async () => {
+      try {
+        const data = await laptopService.getEtatLaptopByClientId();
+        setLaptops(data);
+      } catch (error) {
+        console.error("Error fetching laptop data:", error);
+      }
+    };
+
+    fetchLaptops();
+  }, []);
 
   const handleShowMoreInfo = (laptopId) => {
-    // Find the laptop by ID and set it as the selected laptop
     const laptop = laptops.find((laptop) => laptop.id === laptopId);
     setSelectedLaptop(laptop);
   };
 
+  const handleSendToRepair = (reparationDemandeId) => {
+    navigate(`/technician/create-repair-sheet/${reparationDemandeId}`);
+  };
+
   const closeInfoModal = () => {
-    setSelectedLaptop(null); // Close the modal
+    setSelectedLaptop(null);
   };
 
   return (
@@ -48,24 +44,35 @@ const AllLaptopsTech = () => {
         <h2 className="text-2xl font-bold text-white mb-6">
           Laptops Waiting for Repair
         </h2>
-        <div className="grid grid-cols-3 gap-6">
-          {laptops.map((laptop) => (
-            <div
-              key={laptop.id}
-              className="bg-white p-4 rounded shadow-lg text-black"
-            >
-              <h3 className="font-bold">{laptop.name}</h3>
-              <p>Reference: {laptop.reference}</p>
-              <p>Status: {laptop.status}</p>
-              <button
-                onClick={() => handleShowMoreInfo(laptop.id)}
-                className="mt-4 bg-blue-600 text-white p-2 rounded"
+        {laptops.length > 0 ? (
+          <div className="grid grid-cols-3 gap-6">
+            {laptops.map((laptop) => (
+              <div
+                key={laptop.id}
+                className="bg-white p-4 rounded shadow-lg text-black"
               >
-                Show More Info
-              </button>
-            </div>
-          ))}
-        </div>
+                <h3 className="font-bold">{laptop.appareil.marque} {laptop.appareil.modele}</h3>
+                <p><strong>Client:</strong> {laptop.client.nom}</p>
+                <p><strong>Status:</strong> {laptop.etat}</p>
+                <button
+                  onClick={() => handleShowMoreInfo(laptop.id)}
+                  className="mt-4 bg-blue-600 text-white p-2 rounded"
+                >
+                  Show More Info
+                </button>
+                <button
+                  onClick={() => handleSendToRepair(laptop.id)}
+                  className=" bg-green-600 text-white p-2 rounded"
+                >
+                  Send to Repair
+                </button>  
+              </div>
+              
+            ))}
+          </div>
+        ) : (
+          <p className="text-white">No laptops found.</p>
+        )}
       </div>
 
       {/* Info Modal */}
@@ -78,12 +85,20 @@ const AllLaptopsTech = () => {
             className="bg-white p-6 rounded shadow-lg w-1/3"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-xl font-bold mb-4">{selectedLaptop.name}</h3>
+            <h3 className="text-xl font-bold mb-4">
+              {selectedLaptop.appareil.marque} {selectedLaptop.appareil.modele}
+            </h3>
             <p className="mb-4">
-              <strong>Reference:</strong> {selectedLaptop.reference}
+              <strong>Serial Number:</strong> {selectedLaptop.appareil.numSerie}
             </p>
             <p className="mb-4">
-              <strong>Symptoms:</strong> {selectedLaptop.symptoms}
+              <strong>Client:</strong> {selectedLaptop.client.nom}, {selectedLaptop.client.adresse}
+            </p>
+            <p className="mb-4">
+              <strong>Symptoms:</strong> {selectedLaptop.symptomesPanne}
+            </p>
+            <p className="mb-4">
+              <strong>Status:</strong> {selectedLaptop.etat}
             </p>
             <button
               onClick={closeInfoModal}
@@ -99,3 +114,6 @@ const AllLaptopsTech = () => {
 };
 
 export default AllLaptopsTech;
+
+
+// 

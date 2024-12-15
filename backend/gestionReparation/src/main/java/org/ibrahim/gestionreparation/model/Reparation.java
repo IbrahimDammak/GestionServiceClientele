@@ -1,6 +1,7 @@
 package org.ibrahim.gestionreparation.model;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -26,6 +27,7 @@ public class Reparation {
     private String description;
 
     @Column(nullable = false)
+
     private double tarifHMO = 15;
 
     @Column(nullable = false)
