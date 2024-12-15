@@ -37,7 +37,6 @@ public class PieceRechange {
 
 
     @OneToMany(mappedBy = "piecerechange", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
     private List<ReparationPiece> reparationPieces;
 
 }

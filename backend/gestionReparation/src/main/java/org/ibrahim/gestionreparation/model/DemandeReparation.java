@@ -34,9 +34,4 @@ public class DemandeReparation {
 
     @Column(nullable = false)
     private String symptomesPanne;
-
-    @OneToOne(mappedBy = "demandeReparation")
-    @JsonBackReference // Prevent recursion from this side
-    private Reparation reparation;
 }
-

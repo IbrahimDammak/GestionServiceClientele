@@ -11,7 +11,6 @@ import java.util.Date;
 import java.util.List;
 
 
-
 @Entity
 @Table(name = "reparations")
 @Data
@@ -27,6 +26,8 @@ public class Reparation {
     @Column(nullable = false)
     private String description;
 
+    @Column(nullable = false)
+
     private double tarifHMO = 15;
 
     @Column(nullable = false)
@@ -34,11 +35,8 @@ public class Reparation {
 
     @OneToOne
     @JoinColumn(name = "demande_reparation_id", nullable = false)
-    @JsonManagedReference // Prevent recursion from this side
     private DemandeReparation demandeReparation;
 
-    @OneToMany(mappedBy = "reparation", cascade = CascadeType.ALL)
-    @JsonManagedReference // Manage serialization for pieces
+    @OneToMany(mappedBy = "reparation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReparationPiece> reparationPieces = new ArrayList<>();
 }
-

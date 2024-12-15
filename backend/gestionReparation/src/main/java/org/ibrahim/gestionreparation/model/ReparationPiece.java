@@ -9,23 +9,19 @@ import org.springframework.boot.autoconfigure.web.WebProperties;
 @Table(name = "PiecesReparations")
 @Data
 public class ReparationPiece {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "piece_rechange_id", nullable = false)
-    @JsonBackReference
-    private PieceRechange piecerechange;
+    @JoinColumn(name = "reparation_id", nullable = false)
+    private Reparation reparation;
 
     @ManyToOne
-    @JoinColumn(name = "reparation_id", nullable = false)
-    @JsonBackReference
-    private Reparation reparation;
+    @JoinColumn(name = "piece_rechange_id", nullable = false)
+    private PieceRechange piecerechange;
 
     @Column(nullable = false)
     private int qte;
-
-
-
 }

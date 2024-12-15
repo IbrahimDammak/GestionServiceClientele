@@ -1,5 +1,6 @@
 package org.ibrahim.gestionreparation.service;
 
+import org.ibrahim.gestionreparation.dto.AppareilDTO;
 import org.ibrahim.gestionreparation.exception.ClientNotFoundException;
 import org.ibrahim.gestionreparation.model.Appareil;
 import org.ibrahim.gestionreparation.model.Client;
@@ -22,6 +23,30 @@ public class AppareilService {
         this.appareilRepository = appareilRepository;
         this.clientRepository = clientRepository;
     }
+
+
+    public AppareilDTO convertToDTO(Appareil appareil) {
+        AppareilDTO dto = new AppareilDTO();
+        dto.setId(appareil.getId());
+        dto.setClientId(appareil.getClient().getId());
+        dto.setMarque(appareil.getMarque());
+        dto.setModele(appareil.getModele());
+        dto.setNumSerie(appareil.getNumSerie());
+        return dto;
+    }
+
+    public Appareil convertFromDTO(AppareilDTO dto) {
+        Appareil appareil = new Appareil();
+        appareil.setId(dto.getId());
+        appareil.setMarque(dto.getMarque());
+        appareil.setModele(dto.getModele());
+        appareil.setNumSerie(dto.getNumSerie());
+        appareil.setClient(clientRepository.findById(dto.getClientId())
+                .orElseThrow(() -> new ClientNotFoundException("Client not found with ID: " + dto.getClientId())));
+        return appareil;
+    }
+
+
 
     // Create or update an appareil
     public Appareil saveAppareil(Appareil appareil) {
